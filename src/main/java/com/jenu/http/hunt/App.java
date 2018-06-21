@@ -20,8 +20,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.appviewx.common.utils.BeanType;
-import com.appviewx.common.utils.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Hello world!
@@ -37,7 +37,9 @@ public class App {
 
 	public static final String USER_ID = "HJfdkYGgQ";
 
-	public final static void main(String[] args) {
+	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+	public static final void main(String[] args) {
 
 		try {
 
@@ -59,7 +61,7 @@ public class App {
 	public static String findProductPrice(String input) {
 		String responseString = "";
 		try {
-			final List<Product> request = JsonParser.getParser().convertToBean(input, new BeanType<List<Product>>() {
+			final List<Product> request = convertToBean(input, new TypeReference<List<Product>>() {
 			});
 			final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			final Date todayDate = new Date();
@@ -85,7 +87,7 @@ public class App {
 
 			response.put("totalValue", totalPrice);
 
-			responseString = JsonParser.getParser().convertToJson(response);
+			responseString = convertToJson(response);
 		} catch (IOException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -97,7 +99,7 @@ public class App {
 	public static String findProductByCategory(String input) {
 		String responseString = "";
 		try {
-			final List<Product> request = JsonParser.getParser().convertToBean(input, new BeanType<List<Product>>() {
+			final List<Product> request = convertToBean(input, new TypeReference<List<Product>>() {
 			});
 			final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			final Date todayDate = new Date();
@@ -132,7 +134,7 @@ public class App {
 
 			}
 
-			responseString = JsonParser.getParser().convertToJson(response);
+			responseString = convertToJson(response);
 		} catch (IOException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -144,7 +146,7 @@ public class App {
 	public static String findProductCount(String input) {
 		String responseString = "";
 		try {
-			final List<Product> request = JsonParser.getParser().convertToBean(input, new BeanType<List<Product>>() {
+			final List<Product> request = convertToBean(input, new TypeReference<List<Product>>() {
 			});
 			final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			final Date todayDate = new Date();
@@ -170,7 +172,7 @@ public class App {
 
 			response.put("count", active);
 
-			responseString = JsonParser.getParser().convertToJson(response);
+			responseString = convertToJson(response);
 		} catch (IOException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -183,13 +185,13 @@ public class App {
 
 		String responseString = "";
 		try {
-			List<Object> request = JsonParser.getParser().convertToBean(input, new BeanType<List<Object>>() {
+			List<Object> request = convertToBean(input, new TypeReference<List<Object>>() {
 			});
 
 			Map<String, Object> response = new HashMap<>();
 			response.put("count", request.size());
 
-			responseString = JsonParser.getParser().convertToJson(response);
+			responseString = convertToJson(response);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -270,5 +272,13 @@ public class App {
 		}
 
 		return sb.toString();
+	}
+
+	public static <T> T convertToBean(String json, TypeReference<T> toValueTypeRef) {
+		return OBJECT_MAPPER.convertValue(json, toValueTypeRef);
+	}
+
+	public static <T> String convertToJson(T obj) throws IOException {
+		return OBJECT_MAPPER.writeValueAsString(obj);
 	}
 }
